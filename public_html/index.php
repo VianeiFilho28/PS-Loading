@@ -36,6 +36,7 @@ if (!empty($e)) {
         $categoria_e  = $qe['categoria'] ?? '';
         $prioridade_e = $qe['prioridade'] ?? '';
         $status_e     = $qe['status'] ?? '';
+        $cod_e     = $qe['cod'] ?? '';
     }
 
     mysqli_stmt_close($stmt_e);
@@ -564,7 +565,7 @@ $classe_alerta = match ($tp) {
                                             </svg>
                                         </a>
                                         <!-- Botão Excluir (Lixeira Vermelha) -->
-                                        <a href="#" class="btn-acao btn-excluir shadow-sm" title="Excluir" aria-label="Excluir">
+                                        <a href="crud_solicitacoes.php?a=excluir&cod=<?php echo urlencode($cod);?>" class="btn-acao btn-excluir shadow-sm" title="Excluir" aria-label="Excluir">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
                                                 <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
                                                 <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
