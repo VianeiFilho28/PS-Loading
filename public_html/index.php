@@ -10,6 +10,8 @@ date_default_timezone_set('America/Fortaleza');
 require_once __DIR__ . '/conn/conn.php';
 
 $acao_formulario = 'criar';
+$titulo_formulario = "NOVA SOLICITAÇÃO";
+$botão_formulario = "Registrar Solicitação";
 $resp = $_GET['resp'] ?? '';
 $tp   = $_GET['tp'] ?? '';
 
@@ -20,6 +22,11 @@ if (!empty($e)) {
         http_response_code(400);
         exit('Código inválido.');
     }
+
+    $acao_formulario = 'editar';
+    $titulo_formulario = "EDITAR SOLICITAÇÃO";
+    $botão_formulario = "Editar Solicitação";
+
 
     $sql_e = "SELECT * FROM solicitacoes WHERE cod = ?";
     $stmt_e = mysqli_prepare($conn, $sql_e);
@@ -604,42 +611,75 @@ $classe_alerta = match ($tp) {
         <!-- SEÇÃO 2: FORMULÁRIO DE CADASTRO -->
         <section>
             <div class="titulo-secao">
-                <h2>Nova Solicitação</h2>
+                <h2><?php echo $titulo_formulario;?></h2>
             </div>
 
             <div class="bloco-interno p-4">
                 <form id="form_solicitacoes" action="crud_solicitacoes.php?a=<?php echo htmlspecialchars($acao_formulario, ENT_QUOTES, 'UTF-8'); ?>" method="post" enctype="multipart/form-data">
-                    
-                    <input type="hidden" name="status" value="1">
+                    <?php if(!empty($e)):?>
+                    <input type="hidden" name="cod" value="<?php echo $cod_e;?>">
+                    <?php endif;?>
 
                     <div class="row g-3">
                         <div class="col-md-5">
                             <label for="titulo" class="form-label fw-semibold small text-uppercase">Título</label>
-                            <input type="text" class="campo-form" name="titulo" id="titulo" placeholder="Ex: Erro no acesso ao sistema" required>
+                            <input value="<?php echo htmlspecialchars($titulo_e ??'', ENT_QUOTES, 'UTF-8');?>" type="text" class="campo-form" name="titulo" id="titulo" placeholder="Ex: Erro no acesso ao sistema" required>
                         </div>
 
                         <div class="col-md-4">
                             <label for="categoria" class="form-label fw-semibold small text-uppercase">Categoria</label>
-                            <input type="text" class="campo-form" name="categoria" id="categoria" placeholder="Ex: Suporte, Redes, Financeiro" required>
+                            <input value="<?php echo htmlspecialchars($categoria_e ??'', ENT_QUOTES, 'UTF-8');?>" type="text" class="campo-form" name="categoria" id="categoria" placeholder="Ex: Suporte, Redes, Financeiro" required>
                         </div>
 
                         <div class="col-md-3">
                             <label for="prioridade" class="form-label fw-semibold small text-uppercase">Prioridade</label>
                             <select class="campo-form" name="prioridade" id="prioridade">
-                                <option value="3" selected>Baixa</option>
-                                <option value="2">Média</option>
-                                <option value="1">Alta</option>
+                                <option value="3" <?= ($prioridade_e ?? '') == 3 ? 'selected' : '' ?>>Baixa</option>
+                                <option value="2" <?= ($prioridade_e ?? '') == 2 ? 'selected' : '' ?>>Média</option>
+                                <option value="1" <?= ($prioridade_e ?? '') == 1 ? 'selected' : '' ?>>Alta</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="status" class="form-label fw-semibold small text-uppercase">Situação</label>
+                            <select class="campo-form" name="status" id="status">
+
+                                <?php 
+                                $sql_status = "SELECT * FROM historico_solicitacoes WHERE cod_solicitacao = ? ORDER BY data_registro DESC LIMIT 1";
+                                $stmt_status = mysqli_prepare($conn, $sql_status);
+                                mysqli_stmt_bind_param($stmt_status, 's', $e);
+                                mysqli_stmt_execute($stmt_status);
+                                $result_e = mysqli_stmt_get_result($stmt_status);
+
+                                if ($result_e && mysqli_num_rows($result_e) > 0) {
+                                    $status = mysqli_fetch_assoc($result_e);
+                                    $ultimo_status = $status['status'] ?? '';
+                                }
+                                mysqli_stmt_close($stmt_status);
+                                ?>
+                                <?php if($ultimo_status === 3 || $ultimo_status === 2):?>
+                                <option value="3" <?= ($status_e ?? '') == 3 ? 'selected' : '' ?>>Concluída</option>
+                                <?php endif;?>
+
+                                <?php if($ultimo_status === 2 || $ultimo_status === 1):?>
+                                <option value="2" <?= ($status_e ?? '') == 2 ? 'selected' : '' ?>>Em execução</option>
+                                <?php endif;?>
+
+                                <?php if($ultimo_status === 1):?>
+                                <option value="1" <?= ($status_e ?? '') == 1 ? 'selected' : '' ?>>Aberta</option>
+                                <?php endif;?>
+
                             </select>
                         </div>
 
                         <div class="col-12">
                             <label for="descricao" class="form-label fw-semibold small text-uppercase">Descrição</label>
-                            <textarea class="campo-form" name="descricao" id="descricao" rows="3" placeholder="Descreva os detalhes da solicitação..." required></textarea>
+                            <textarea class="campo-form" name="descricao" id="descricao" rows="3" placeholder="Descreva os detalhes da solicitação..." required><?php echo htmlspecialchars($descricao_e ??'', ENT_QUOTES, 'UTF-8');?></textarea>
                         </div>
 
                         <div class="col-12 text-end mt-3">
                             <button form="form_solicitacoes" type="submit" class="btn btn-roxo px-4 py-2 fw-medium">
-                                Registrar Solicitação
+                                <?php echo $botão_formulario; ?>
                             </button>
                         </div>
                     </div>
