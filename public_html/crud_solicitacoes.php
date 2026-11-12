@@ -8,18 +8,22 @@ header('Content-Type: text/html; charset=UTF-8');
 require_once __DIR__ . '/conn/conn.php';
 date_default_timezone_set('America/Fortaleza');
 
-$a = $_GET['a'] ?? header('Location: agentes.php?resp=Formulário Inváido');
+$a = $_GET['a'] ?? '';
 
-$titulo = trim((string)($_POST['titulo'] ?? ''));
-$descricao = trim((string)($_POST['descricao'] ?? ''));
-$categoria = trim((string)($_POST['categoria'] ?? ''));
-$prioridade = trim((int)($_POST['prioridade'] ?? ''));
-$status = trim((int)($_POST['status'] ?? ''));
+if ($a === '') {
+    header('Location: agentes.php?resp=' . urlencode('Formulário Inválido') . '&tp=f');
+    exit;
+}
 
+if ($a === 'criar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
-if($a == 'criar' && $_SERVER['REQUEST_METHOD'] === 'POST'){
+    $titulo     = trim((string)($_POST['titulo'] ?? ''));
+    $descricao  = trim((string)($_POST['descricao'] ?? ''));
+    $categoria  = trim((string)($_POST['categoria'] ?? ''));
+    $prioridade = (int)($_POST['prioridade'] ?? 0);
+    $status     = (int)($_POST['status'] ?? 0);
 
-$codigo_unico = bin2hex(random_bytes(16));
+    $codigo_unico = bin2hex(random_bytes(16));
 
     $sql = "INSERT INTO solicitacoes
             (
@@ -31,36 +35,30 @@ $codigo_unico = bin2hex(random_bytes(16));
                 cod,
                 data_registro
             )
-            VALUES (?, ?, ?, ?, ?, ?, NOW())";
+            VALUES (?, ?, ?, ?, 1, ?, NOW())";
 
     $stmt = mysqli_prepare($conn, $sql);
 
     mysqli_stmt_bind_param(
         $stmt,
-        'sssiis',
+        'sssis',
         $titulo,
         $descricao,
         $categoria,
         $prioridade,
-        $status,
         $codigo_unico
     );
 
     if (mysqli_stmt_execute($stmt)) {
         mysqli_stmt_close($stmt);
-        header("Location: index.php?resp=A Solicitação $titulo foi cadastrada com sucesso!");
+        $msg = urlencode("A Solicitação $titulo foi cadastrada com sucesso!");
+        header("Location: index.php?resp=$msg&tp=s");
         exit;
     }
 
-    $erro = mysqli_stmt_error($stmt);
     mysqli_stmt_close($stmt);
-    header("Location: index.php?resp=Erro ao cadastrar a Solicitação $titulo!");
-        exit;
-
-
-    
-
+    $msg = urlencode("Erro ao cadastrar a Solicitação $titulo!");
+    header("Location: index.php?resp=$msg&tp=f");
+    exit;
 }
-
-
 ?>
