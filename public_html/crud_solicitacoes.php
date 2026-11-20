@@ -22,6 +22,13 @@ if ($a === 'criar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $categoria  = trim((string)($_POST['categoria'] ?? ''));
     $prioridade = (int)($_POST['prioridade'] ?? 0);
 
+    // Validação de campos obrigatórios e prioridade válida (RF01 e RF06)
+    if ($titulo === '' || $descricao === '' || $categoria === '' || !in_array($prioridade, [1, 2, 3], true)) {
+        $msg = urlencode("Preencha todos os campos obrigatórios (Título, Categoria, Prioridade e Descrição)!");
+        header("Location: index.php?resp=$msg&tp=f");
+        exit;
+    }
+
     $codigo_unico = bin2hex(random_bytes(16));
 
     $sql = "INSERT INTO solicitacoes
@@ -106,18 +113,29 @@ if ($a === 'editar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    // Validação de campos obrigatórios, prioridade e status válidos (RF06)
+    if ($titulo === '' || $descricao === '' || $categoria === '' || !in_array($prioridade, [1, 2, 3], true) || !in_array($status, [1, 2, 3], true)) {
+        $msg = urlencode("Todos os campos obrigatórios devem ser preenchidos corretamente!");
+        header("Location: index.php?e=" . urlencode($cod) . "&resp=$msg&tp=f");
+        exit;
+    }
+
     // Buscar o ID e o status atual no banco para validar o salto
     $sql_val = "SELECT id, status FROM solicitacoes WHERE cod = ? LIMIT 1";
     $st_val = mysqli_prepare($conn, $sql_val);
     mysqli_stmt_bind_param($st_val, 's', $cod);
     mysqli_stmt_execute($st_val);
     $res_val = mysqli_stmt_get_result($st_val);
-    $id_solicitacao = 0;
-    $status_atual = 1;
-    if ($row_val = mysqli_fetch_assoc($res_val)) {
-        $id_solicitacao = (int)$row_val['id'];
-        $status_atual   = (int)$row_val['status'];
+
+    if (!$row_val = mysqli_fetch_assoc($res_val)) {
+        mysqli_stmt_close($st_val);
+        $msg = urlencode("Solicitação não encontrada!");
+        header("Location: index.php?resp=$msg&tp=f");
+        exit;
     }
+
+    $id_solicitacao = (int)$row_val['id'];
+    $status_atual   = (int)$row_val['status'];
     mysqli_stmt_close($st_val);
 
     // Regra: Aberta(1) -> Em andamento(2) -> Concluída(3)
@@ -162,8 +180,8 @@ if ($a === 'editar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     mysqli_stmt_close($stmt);
 
-    // Registra no histórico apenas quando o status for 2 ou 3
-    if ($status === 2 || $status === 3) {
+    // Registra no histórico apenas quando o status mudar para 2 ou 3
+    if ($status !== $status_atual && ($status === 2 || $status === 3)) {
         $desc_historico = ($status === 2)
             ? "A Solicitação #$id_solicitacao ($titulo) está em Andamento"
             : "A Solicitação #$id_solicitacao ($titulo) foi Concluída";
