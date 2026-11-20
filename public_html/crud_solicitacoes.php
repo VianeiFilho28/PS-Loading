@@ -54,7 +54,11 @@ if ($a === 'criar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: index.php?resp=$msg&tp=f");
         exit;
     }
+
+    $id_solicitacao = mysqli_insert_id($conn);
     mysqli_stmt_close($stmt);
+
+    $desc_historico = "A Solicitação #$id_solicitacao ($titulo) foi Aberta";
 
     $sql_his = "INSERT INTO historico_solicitacoes
             (
@@ -63,14 +67,15 @@ if ($a === 'criar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 descricao,
                 data_registro
             )
-            VALUES (?, 1, 'A Solicitação foi Aberta', NOW())";
+            VALUES (?, 1, ?, NOW())";
 
     $stmt_his = mysqli_prepare($conn, $sql_his);
 
     mysqli_stmt_bind_param(
         $stmt_his,
-        's',
-        $codigo_unico
+        'ss',
+        $codigo_unico,
+        $desc_historico
     );
 
     if (mysqli_stmt_execute($stmt_his)) {
@@ -101,15 +106,17 @@ if ($a === 'editar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Buscar o status atual no banco para validar o salto
-    $sql_val = "SELECT status FROM solicitacoes WHERE cod = ? LIMIT 1";
+    // Buscar o ID e o status atual no banco para validar o salto
+    $sql_val = "SELECT id, status FROM solicitacoes WHERE cod = ? LIMIT 1";
     $st_val = mysqli_prepare($conn, $sql_val);
     mysqli_stmt_bind_param($st_val, 's', $cod);
     mysqli_stmt_execute($st_val);
     $res_val = mysqli_stmt_get_result($st_val);
+    $id_solicitacao = 0;
     $status_atual = 1;
     if ($row_val = mysqli_fetch_assoc($res_val)) {
-        $status_atual = (int)$row_val['status'];
+        $id_solicitacao = (int)$row_val['id'];
+        $status_atual   = (int)$row_val['status'];
     }
     mysqli_stmt_close($st_val);
 
@@ -120,11 +127,10 @@ if ($a === 'editar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
     if ($status < $status_atual) {
-         $msg = urlencode("Transição inválida: Não é permitido retroceder o status de uma solicitação.");
-         header("Location: index.php?resp=$msg&tp=f");
-         exit;
+        $msg = urlencode("Transição inválida: Não é permitido retroceder o status de uma solicitação.");
+        header("Location: index.php?resp=$msg&tp=f");
+        exit;
     }
-    // ------------------------------------------------------
 
     $sql = "UPDATE solicitacoes
             SET titulo = ?,
@@ -159,8 +165,8 @@ if ($a === 'editar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // Registra no histórico apenas quando o status for 2 ou 3
     if ($status === 2 || $status === 3) {
         $desc_historico = ($status === 2)
-            ? 'Solicitação está em Andamento'
-            : 'A Solicitação está Concluida';
+            ? "A Solicitação #$id_solicitacao ($titulo) está em Andamento"
+            : "A Solicitação #$id_solicitacao ($titulo) foi Concluída";
 
         $sql_his = "INSERT INTO historico_solicitacoes
                 (
@@ -205,6 +211,24 @@ if ($a === 'excluir' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         exit;
     }
 
+    // Busca o ID e o título da solicitação antes de excluí-la do banco
+    $sql_busca = "SELECT id, titulo FROM solicitacoes WHERE cod = ? LIMIT 1";
+    $st_busca = mysqli_prepare($conn, $sql_busca);
+    mysqli_stmt_bind_param($st_busca, 's', $cod);
+    mysqli_stmt_execute($st_busca);
+    $res_busca = mysqli_stmt_get_result($st_busca);
+
+    if (!$row_busca = mysqli_fetch_assoc($res_busca)) {
+        mysqli_stmt_close($st_busca);
+        $msg = urlencode("Solicitação não encontrada ou já excluída!");
+        header("Location: index.php?resp=$msg&tp=f");
+        exit;
+    }
+
+    $id_excluido     = (int)$row_busca['id'];
+    $titulo_excluido = $row_busca['titulo'];
+    mysqli_stmt_close($st_busca);
+
     $sql_excluir = "DELETE FROM solicitacoes
                     WHERE cod = ?
                     LIMIT 1";
@@ -215,6 +239,8 @@ if ($a === 'excluir' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     if (mysqli_stmt_execute($st_excluir)) {
         mysqli_stmt_close($st_excluir);
 
+        $desc_historico = "A Solicitação #$id_excluido ($titulo_excluido) foi Excluída";
+
         $sql_his = "INSERT INTO historico_solicitacoes
             (
                 cod_solicitacao,
@@ -222,19 +248,20 @@ if ($a === 'excluir' && $_SERVER['REQUEST_METHOD'] === 'GET') {
                 descricao,
                 data_registro
             )
-            VALUES (?, 4, 'A Solicitação foi Excluída', NOW())";
+            VALUES (?, 4, ?, NOW())";
 
         $stmt_his = mysqli_prepare($conn, $sql_his);
 
         mysqli_stmt_bind_param(
             $stmt_his,
-            's',
-            $cod
+            'ss',
+            $cod,
+            $desc_historico
         );
 
         if (mysqli_stmt_execute($stmt_his)) {
             mysqli_stmt_close($stmt_his);
-            $msg = urlencode("A Solicitação foi excluída com sucesso!");
+            $msg = urlencode("A Solicitação #$id_excluido ($titulo_excluido) foi excluída com sucesso!");
             header("Location: index.php?resp=$msg&tp=s");
             exit;
         }

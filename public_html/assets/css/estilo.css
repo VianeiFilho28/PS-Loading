@@ -1,0 +1,341 @@
+:root, [data-bs-theme="light"] {
+    --roxo-principal: #6f42c1;
+    --roxo-escuro: #4a258c;
+    --roxo-medio: #8257e5;
+    --roxo-suave: #f3ebff;
+    --roxo-borda: #d8c2ff;
+    --bs-body-bg: #ebe6f5;
+    --bs-body-color: #212529;
+    --bs-table-bg: #ffffff;
+    --bs-table-color: #212529;
+    --bs-table-hover-bg: #faf7ff;
+    --bs-border-color: #e9e4f2;
+}
+
+body {
+    background-color: #ebe6f5 !important;
+    color: #212529 !important;
+    margin: 0;
+    padding: 0;
+}
+
+/* Cabeçalho Superior */
+.topo-sistema {
+    background: linear-gradient(180deg, #8558d6 0%, #5b32a8 65%, #3d1e78 100%) !important;
+    color: #ffffff !important;
+    padding: 2rem 1rem 1.75rem 1rem;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(45, 20, 95, 0.25);
+}
+
+.topo-sistema h1 {
+    color: #ffffff !important;
+    font-weight: 700;
+    font-size: 2rem;
+    margin: 0;
+    text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.28);
+    letter-spacing: 0.4px;
+}
+
+.topo-sistema p {
+    color: #e9dfff !important;
+    font-size: 0.98rem;
+    margin: 0.45rem 0 0 0;
+}
+
+/* Corpo Centralizado estilo Folha de Documento */
+.corpo-principal {
+    max-width: 1120px;
+    min-height: calc(100vh - 140px);
+    margin: 0 auto 2.5rem auto;
+    background-color: #ffffff;
+    padding: 2rem 2.25rem 2.75rem 2.25rem;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    box-shadow: 0 0 18px rgba(58, 30, 112, 0.16);
+}
+
+@media (max-width: 768px) {
+    .corpo-principal {
+        padding: 1.25rem 1rem 2rem 1rem;
+        margin-bottom: 1rem;
+        border-radius: 0;
+    }
+}
+
+/* Faixa de título de seção */
+.titulo-secao {
+    background: linear-gradient(90deg, #efe7ff 0%, #f8f5ff 55%, rgba(255, 255, 255, 0) 100%);
+    border-left: 5px solid var(--roxo-principal);
+    padding: 0.55rem 1rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.titulo-secao h2 {
+    color: var(--roxo-escuro) !important;
+    font-size: 1.22rem;
+    font-weight: 700;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.text-roxo {
+    color: var(--roxo-principal) !important;
+}
+
+.badge-roxo-suave {
+    background-color: var(--roxo-suave) !important;
+    color: var(--roxo-principal) !important;
+    border: 1px solid var(--roxo-borda) !important;
+}
+
+/* Contador de registros */
+.badge-contador {
+    background: linear-gradient(135deg, var(--roxo-principal), var(--roxo-escuro)) !important;
+    color: #ffffff !important;
+    font-size: 0.88rem !important;
+    font-weight: 600 !important;
+    padding: 0.42rem 1.05rem !important;
+    border-radius: 50rem !important;
+    box-shadow: 0 2px 6px rgba(111, 66, 193, 0.28);
+    letter-spacing: 0.2px;
+}
+
+/* Badges de Prioridade e Status */
+.badge-alta {
+    background-color: #dc3545 !important;
+    color: #ffffff !important;
+}
+
+.badge-media {
+    background-color: #fd7e14 !important;
+    color: #ffffff !important;
+}
+
+.badge-baixa {
+    background-color: #0dcaf0 !important;
+    color: #212529 !important;
+}
+
+.badge-aberta {
+    background-color: #6c757d !important;
+    color: #ffffff !important;
+}
+
+.badge-andamento {
+    background-color: #ffc107 !important;
+    color: #212529 !important;
+}
+
+.badge-concluida {
+    background-color: #198754 !important;
+    color: #ffffff !important;
+}
+
+/* Botões Roxos */
+.btn-roxo {
+    background-color: var(--roxo-principal) !important;
+    border-color: var(--roxo-principal) !important;
+    color: #ffffff !important;
+    border-radius: 0.375rem;
+}
+
+.btn-roxo:hover,
+.btn-roxo:focus {
+    background-color: var(--roxo-escuro) !important;
+    border-color: var(--roxo-escuro) !important;
+    color: #ffffff !important;
+}
+
+.btn-roxo:disabled {
+    background-color: #b79fe3 !important;
+    border-color: #b79fe3 !important;
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.btn-outline-roxo {
+    background-color: #ffffff !important;
+    border: 1px solid var(--roxo-principal) !important;
+    color: var(--roxo-principal) !important;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.btn-outline-roxo:hover {
+    background-color: var(--roxo-suave) !important;
+    color: var(--roxo-escuro) !important;
+}
+
+/* Alertas */
+.alerta-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+}
+
+.alerta-sucesso {
+    background-color: #d1e7dd;
+    color: #0f5132;
+    border: 1px solid #badbcc;
+    border-left: 5px solid #198754;
+}
+
+.alerta-erro {
+    background-color: #f8d7da;
+    color: #842029;
+    border: 1px solid #f5c2c7;
+    border-left: 5px solid #dc3545;
+}
+
+.alerta-roxo {
+    background-color: var(--roxo-suave);
+    color: var(--roxo-escuro);
+    border: 1px solid var(--roxo-borda);
+    border-left: 5px solid var(--roxo-principal);
+}
+
+.btn-fechar-alerta {
+    background: transparent;
+    border: none;
+    font-size: 1.35rem;
+    line-height: 1;
+    color: inherit;
+    opacity: 0.7;
+    cursor: pointer;
+    padding: 0 0.25rem;
+    margin-left: 1rem;
+}
+
+.btn-fechar-alerta:hover {
+    opacity: 1;
+}
+
+/* Botões de Ação na Tabela */
+.btn-acao {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border-radius: 6px;
+    border: none;
+    text-decoration: none;
+    transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.btn-acao:hover {
+    transform: translateY(-1px);
+    filter: brightness(0.93);
+}
+
+.btn-editar {
+    background-color: #ffc107 !important;
+    color: #212529 !important;
+}
+
+.btn-excluir {
+    background-color: #dc3545 !important;
+    color: #ffffff !important;
+}
+
+/* Blocos e Tabela */
+.bloco-interno {
+    border: 1px solid #e7dff5;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #ffffff;
+}
+
+.table, .table > :not(caption) > * > * {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    border-color: #ede8f5 !important;
+}
+
+.table thead th {
+    background-color: #f4effc !important;
+    color: #4a258c !important;
+}
+
+.table-hover > tbody > tr:hover > * {
+    background-color: #faf7ff !important;
+}
+
+/* Inputs e Selects */
+.campo-form {
+    display: block;
+    width: 100%;
+    height: 40px;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.95rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529 !important;
+    background-color: #ffffff !important;
+    border: 1px solid #d5cce6 !important;
+    border-radius: 0.375rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+textarea.campo-form {
+    height: auto;
+    min-height: 95px;
+}
+
+select.campo-form {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 2.25rem;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2359339d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 14px 10px;
+    cursor: pointer;
+}
+
+.select-qtd {
+    width: 78px !important;
+    text-align: center;
+    padding-left: 0.5rem !important;
+    padding-right: 1.75rem !important;
+    background-position: right 0.5rem center !important;
+}
+
+.campo-form::placeholder {
+    color: #8c829e !important;
+}
+
+.campo-form:focus {
+    outline: 0;
+    border-color: var(--roxo-principal) !important;
+    box-shadow: 0 0 0 0.25rem rgba(111, 66, 193, 0.2) !important;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.4rem;
+    color: #4a3f5c !important;
+}
+
+.barra-filtros {
+    background-color: #faf8fe;
+    border-bottom: 1px solid #e7dff5;
+}
+
+.rodape-paginacao {
+    background-color: #faf8fe;
+    border-top: 1px solid #e7dff5;
+}

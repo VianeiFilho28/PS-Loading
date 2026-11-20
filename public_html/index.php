@@ -27,7 +27,6 @@ if (!empty($e)) {
     $titulo_formulario = "EDITAR SOLICITAÇÃO";
     $botão_formulario = "Editar Solicitação";
 
-
     $sql_e = "SELECT * FROM solicitacoes WHERE cod = ?";
     $stmt_e = mysqli_prepare($conn, $sql_e);
     mysqli_stmt_bind_param($stmt_e, 's', $e);
@@ -43,13 +42,12 @@ if (!empty($e)) {
         $categoria_e  = $qe['categoria'] ?? '';
         $prioridade_e = $qe['prioridade'] ?? '';
         $status_e     = $qe['status'] ?? '';
-        $cod_e     = $qe['cod'] ?? '';
+        $cod_e        = $qe['cod'] ?? '';
     }
 
     mysqli_stmt_close($stmt_e);
 }
 
-// Define a classe do alerta conforme tp (s = verde, f = vermelho, padrão = roxo)
 $classe_alerta = match ($tp) {
     's'     => 'alerta-sucesso',
     'f'     => 'alerta-erro',
@@ -63,351 +61,7 @@ $classe_alerta = match ($tp) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestão de Solicitações</title>
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-    <style>
-        :root, [data-bs-theme="light"] {
-            --roxo-principal: #6f42c1;
-            --roxo-escuro: #4a258c;
-            --roxo-medio: #8257e5;
-            --roxo-suave: #f3ebff;
-            --roxo-borda: #d8c2ff;
-            --bs-body-bg: #ebe6f5;
-            --bs-body-color: #212529;
-            --bs-table-bg: #ffffff;
-            --bs-table-color: #212529;
-            --bs-table-hover-bg: #faf7ff;
-            --bs-border-color: #e9e4f2;
-        }
-
-        body {
-            background-color: #ebe6f5 !important;
-            color: #212529 !important;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Cabeçalho Superior (inspirado na referência) */
-        .topo-sistema {
-            background: linear-gradient(180deg, #8558d6 0%, #5b32a8 65%, #3d1e78 100%) !important;
-            color: #ffffff !important;
-            padding: 2rem 1rem 1.75rem 1rem;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(45, 20, 95, 0.25);
-        }
-
-        .topo-sistema h1 {
-            color: #ffffff !important;
-            font-weight: 700;
-            font-size: 2rem;
-            margin: 0;
-            text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.28);
-            letter-spacing: 0.4px;
-        }
-
-        .topo-sistema p {
-            color: #e9dfff !important;
-            font-size: 0.98rem;
-            margin: 0.45rem 0 0 0;
-        }
-
-        /* Corpo Centralizado estilo Folha de Documento (encaixado no topo) */
-        .corpo-principal {
-            max-width: 1120px;
-            min-height: calc(100vh - 140px);
-            margin: 0 auto 2.5rem auto;
-            background-color: #ffffff;
-            padding: 2rem 2.25rem 2.75rem 2.25rem;
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-            box-shadow: 0 0 18px rgba(58, 30, 112, 0.16);
-        }
-
-        @media (max-width: 768px) {
-            .corpo-principal {
-                padding: 1.25rem 1rem 2rem 1rem;
-                margin-bottom: 1rem;
-                border-radius: 0;
-            }
-        }
-
-        /* Faixa de título de seção (estilo degradê lateral da referência) */
-        .titulo-secao {
-            background: linear-gradient(90deg, #efe7ff 0%, #f8f5ff 55%, rgba(255, 255, 255, 0) 100%);
-            border-left: 5px solid var(--roxo-principal);
-            padding: 0.55rem 1rem;
-            margin-bottom: 1.25rem;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .titulo-secao h2 {
-            color: var(--roxo-escuro) !important;
-            font-size: 1.22rem;
-            font-weight: 700;
-            margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-        }
-
-        .text-roxo {
-            color: var(--roxo-principal) !important;
-        }
-
-        .badge-roxo-suave {
-            background-color: var(--roxo-suave) !important;
-            color: var(--roxo-principal) !important;
-            border: 1px solid var(--roxo-borda) !important;
-        }
-
-        /* Destaque para o contador de registros */
-        .badge-contador {
-            background: linear-gradient(135deg, var(--roxo-principal), var(--roxo-escuro)) !important;
-            color: #ffffff !important;
-            font-size: 0.88rem !important;
-            font-weight: 600 !important;
-            padding: 0.42rem 1.05rem !important;
-            border-radius: 50rem !important;
-            box-shadow: 0 2px 6px rgba(111, 66, 193, 0.28);
-            letter-spacing: 0.2px;
-        }
-
-        /* Badges de Prioridade e Status */
-        .badge-alta {
-            background-color: #dc3545 !important;
-            color: #ffffff !important;
-        }
-
-        .badge-media {
-            background-color: #fd7e14 !important;
-            color: #ffffff !important;
-        }
-
-        .badge-baixa {
-            background-color: #0dcaf0 !important;
-            color: #212529 !important;
-        }
-
-        .badge-aberta {
-            background-color: #6c757d !important;
-            color: #ffffff !important;
-        }
-
-        .badge-andamento {
-            background-color: #ffc107 !important;
-            color: #212529 !important;
-        }
-
-        .badge-concluida {
-            background-color: #198754 !important;
-            color: #ffffff !important;
-        }
-
-        .btn-roxo {
-            background-color: var(--roxo-principal) !important;
-            border-color: var(--roxo-principal) !important;
-            color: #ffffff !important;
-            border-radius: 0.375rem;
-        }
-
-        .btn-roxo:hover,
-        .btn-roxo:focus {
-            background-color: var(--roxo-escuro) !important;
-            border-color: var(--roxo-escuro) !important;
-            color: #ffffff !important;
-        }
-
-        .btn-roxo:disabled {
-            background-color: #b79fe3 !important;
-            border-color: #b79fe3 !important;
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-
-        .btn-outline-roxo {
-            background-color: #ffffff !important;
-            border: 1px solid var(--roxo-principal) !important;
-            color: var(--roxo-principal) !important;
-            border-radius: 0.375rem;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-
-        .btn-outline-roxo:hover {
-            background-color: var(--roxo-suave) !important;
-            color: var(--roxo-escuro) !important;
-        }
-
-        /* Estilos do Alerta Personalizado */
-        .alerta-box {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.9rem 1.25rem;
-            border-radius: 0.5rem;
-            font-weight: 500;
-        }
-
-        .alerta-sucesso {
-            background-color: #d1e7dd;
-            color: #0f5132;
-            border: 1px solid #badbcc;
-            border-left: 5px solid #198754;
-        }
-
-        .alerta-erro {
-            background-color: #f8d7da;
-            color: #842029;
-            border: 1px solid #f5c2c7;
-            border-left: 5px solid #dc3545;
-        }
-
-        .alerta-roxo {
-            background-color: var(--roxo-suave);
-            color: var(--roxo-escuro);
-            border: 1px solid var(--roxo-borda);
-            border-left: 5px solid var(--roxo-principal);
-        }
-
-        .btn-fechar-alerta {
-            background: transparent;
-            border: none;
-            font-size: 1.35rem;
-            line-height: 1;
-            color: inherit;
-            opacity: 0.7;
-            cursor: pointer;
-            padding: 0 0.25rem;
-            margin-left: 1rem;
-        }
-
-        .btn-fechar-alerta:hover {
-            opacity: 1;
-        }
-
-        /* Botões de Ação com cores explícitas */
-        .btn-acao {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 34px;
-            height: 34px;
-            padding: 0;
-            border-radius: 6px;
-            border: none;
-            text-decoration: none;
-            transition: transform 0.15s ease, filter 0.15s ease;
-        }
-
-        .btn-acao:hover {
-            transform: translateY(-1px);
-            filter: brightness(0.93);
-        }
-
-        .btn-editar {
-            background-color: #ffc107 !important;
-            color: #212529 !important;
-        }
-
-        .btn-excluir {
-            background-color: #dc3545 !important;
-            color: #ffffff !important;
-        }
-
-        /* Bloco interno da tabela e do formulário dentro da folha */
-        .bloco-interno {
-            border: 1px solid #e7dff5;
-            border-radius: 8px;
-            overflow: hidden;
-            background-color: #ffffff;
-        }
-
-        /* Tabela clara */
-        .table, .table > :not(caption) > * > * {
-            background-color: #ffffff !important;
-            color: #212529 !important;
-            border-color: #ede8f5 !important;
-        }
-
-        .table thead th {
-            background-color: #f4effc !important;
-            color: #4a258c !important;
-        }
-
-        .table-hover > tbody > tr:hover > * {
-            background-color: #faf7ff !important;
-        }
-
-        /* Padronização completa de Inputs e Select */
-        .campo-form {
-            display: block;
-            width: 100%;
-            height: 40px;
-            padding: 0.45rem 0.75rem;
-            font-size: 0.95rem;
-            font-weight: 400;
-            line-height: 1.5;
-            color: #212529 !important;
-            background-color: #ffffff !important;
-            border: 1px solid #d5cce6 !important;
-            border-radius: 0.375rem;
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-        }
-
-        textarea.campo-form {
-            height: auto;
-            min-height: 95px;
-        }
-
-        select.campo-form {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            padding-right: 2.25rem;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2359339d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 14px 10px;
-            cursor: pointer;
-        }
-
-        /* Select compacto para quantidade por página */
-        .select-qtd {
-            width: 78px !important;
-            text-align: center;
-            padding-left: 0.5rem !important;
-            padding-right: 1.75rem !important;
-            background-position: right 0.5rem center !important;
-        }
-
-        .campo-form::placeholder {
-            color: #8c829e !important;
-        }
-
-        .campo-form:focus {
-            outline: 0;
-            border-color: var(--roxo-principal) !important;
-            box-shadow: 0 0 0 0.25rem rgba(111, 66, 193, 0.2) !important;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.4rem;
-            color: #4a3f5c !important;
-        }
-
-        /* Barra de controles da tabela */
-        .barra-filtros {
-            background-color: #faf8fe;
-            border-bottom: 1px solid #e7dff5;
-        }
-
-        .rodape-paginacao {
-            background-color: #faf8fe;
-            border-top: 1px solid #e7dff5;
-        }
-    </style>
+    <link rel="stylesheet" href="assets/css/estilo.css">
 </head>
 <body>
 
@@ -429,7 +83,7 @@ $classe_alerta = match ($tp) {
     <!-- Corpo Principal em formato Folha Centralizada -->
     <main class="corpo-principal">
 
-        <!-- Alerta de Feedback (tp=s -> Verde | tp=f -> Vermelho) -->
+        <!-- Alerta de Feedback -->
         <?php if ($resp !== ''): ?>
             <div id="alerta-feedback" class="alerta-box <?php echo $classe_alerta; ?> shadow-sm mb-4" role="alert">
                 <span><?php echo htmlspecialchars($resp, ENT_QUOTES, 'UTF-8'); ?></span>
@@ -565,13 +219,13 @@ $classe_alerta = match ($tp) {
                                 </td>
                                 <td class="text-end pe-4">
                                     <div class="d-inline-flex gap-2">
-                                        <!-- Botão Editar (Lápis Amarelo) -->
+                                        <!-- Botão Editar -->
                                         <a href="?e=<?php echo urlencode($cod); ?>" class="btn-acao btn-editar shadow-sm" title="Editar" aria-label="Editar">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
                                                 <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
                                             </svg>
                                         </a>
-                                        <!-- Botão Excluir (Lixeira Vermelha) -->
+                                        <!-- Botão Excluir -->
                                         <a href="crud_solicitacoes.php?a=excluir&cod=<?php echo urlencode($cod);?>" class="btn-acao btn-excluir shadow-sm" title="Excluir" aria-label="Excluir">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
                                                 <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
@@ -583,7 +237,6 @@ $classe_alerta = match ($tp) {
                             </tr>
                             <?php } mysqli_stmt_close($stmt); ?>
 
-                            <!-- Mensagem quando nenhum registro corresponder à busca/filtro -->
                             <tr id="linhaSemResultados" style="display: none;">
                                 <td colspan="6" class="text-center py-4 text-muted">
                                     Nenhuma solicitação encontrada para os filtros informados.
@@ -608,7 +261,48 @@ $classe_alerta = match ($tp) {
             </div>
         </section>
 
-        <!-- SEÇÃO 2: FORMULÁRIO DE CADASTRO -->
+        <!-- SEÇÃO 2: EXPORTAR RELATÓRIO -->
+        <section class="mb-5">
+            <div class="titulo-secao">
+                <h2>Exportar Relatório</h2>
+            </div>
+
+            <div class="bloco-interno p-3">
+                <form action="exportar_historico.php" method="get" target="_blank" id="formExportacao">
+                    <div class="d-flex flex-wrap flex-md-nowrap align-items-end gap-3">
+                        <div style="flex: 1 1 250px;">
+                            <label for="exportTabela" class="form-label fw-semibold small text-uppercase mb-1">Dados para Exportação:</label>
+                            <select name="tabela" id="exportTabela" class="campo-form">
+                                <option value="solicitacoes">Solicitações Cadastradas</option>
+                                <option value="historico">Histórico de Movimentações</option>
+                            </select>
+                        </div>
+
+                        <div style="flex: 1 1 200px;">
+                            <label for="exportFormato" class="form-label fw-semibold small text-uppercase mb-1">Formato do Arquivo:</label>
+                            <select name="formato" id="exportFormato" class="campo-form">
+                                <option value="pdf">Exibir PDF</option>
+                                <option value="excel">Planilha (.xls)</option>
+                                <option value="csv">Arquivo .CSV</option>
+                                <option value="txt">Arquivo .TXT</option>
+                            </select>
+                        </div>
+
+                        <div style="flex: 0 0 auto;">
+                            <button type="submit" class="btn btn-roxo px-4 d-inline-flex align-items-center gap-2 fw-medium shadow-sm" style="height: 40px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+                                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+                                </svg>
+                                <span>Exportar</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 3: FORMULÁRIO DE CADASTRO -->
         <section>
             <div class="titulo-secao">
                 <h2><?php echo $titulo_formulario;?></h2>
@@ -643,8 +337,8 @@ $classe_alerta = match ($tp) {
                         <div class="col-md-3">
                             <label for="status" class="form-label fw-semibold small text-uppercase">Situação</label>
                             <select class="campo-form" name="status" id="status">
-
                                 <?php 
+                                $ultimo_status = '';
                                 $sql_status = "SELECT * FROM historico_solicitacoes WHERE cod_solicitacao = ? ORDER BY data_registro DESC LIMIT 1";
                                 $stmt_status = mysqli_prepare($conn, $sql_status);
                                 mysqli_stmt_bind_param($stmt_status, 's', $e);
@@ -662,13 +356,12 @@ $classe_alerta = match ($tp) {
                                 <?php endif;?>
 
                                 <?php if($ultimo_status === 2 || $ultimo_status === 1):?>
-                                <option value="2" <?= ($status_e ?? '') == 2 ? 'selected' : '' ?>>Em execução</option>
+                                <option value="2" <?= ($status_e ?? '') == 2 ? 'selected' : '' ?>>Em Andamento</option>
                                 <?php endif;?>
 
-                                <?php if($ultimo_status === 1):?>
+                                <?php if($ultimo_status === 1 || $ultimo_status === ''):?>
                                 <option value="1" <?= ($status_e ?? '') == 1 ? 'selected' : '' ?>>Aberta</option>
                                 <?php endif;?>
-
                             </select>
                         </div>
 
@@ -683,7 +376,6 @@ $classe_alerta = match ($tp) {
                             </button>
                         </div>
                     </div>
-
                 </form>
             </div>
         </section>
@@ -713,6 +405,13 @@ $classe_alerta = match ($tp) {
             const nextPageBtn         = document.getElementById("nextPage");
             const linhaSemResultados  = document.getElementById("linhaSemResultados");
             const contadorRegistros   = document.getElementById("contadorRegistros");
+            const formExportacao      = document.getElementById("formExportacao");
+            const exportFormato       = document.getElementById("exportFormato");
+
+            // Abre PDF em nova aba e faz download direto nos demais formatos
+            formExportacao.addEventListener("submit", function() {
+                formExportacao.target = (exportFormato.value === "pdf") ? "_blank" : "_self";
+            });
 
             const allRows = Array.from(document.querySelectorAll("#corpoTabela tr.linha-dado"));
             let rowsPerPage  = parseInt(rowsPerPageSelector.value, 10);
