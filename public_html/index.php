@@ -80,7 +80,7 @@ $classe_alerta = match ($tp) {
         <p>Controle, acompanhamento e registro de chamados em um único lugar</p>
     </header>
 
-    <!-- Corpo Principal em formato Folha Centralizada -->
+    <!-- Corpo Principal -->
     <main class="corpo-principal">
 
         <!-- Alerta de Feedback -->
